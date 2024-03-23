@@ -1,0 +1,71 @@
+﻿@using System.Threading.Tasks
+@using SchedulerWeb.Enums
+
+@code {
+    private ExceptionType currentException = ExceptionType.NoException;
+    private List<ExceptionType> exceptionTypes = Enum.GetValues(typeof(ExceptionType)).Cast<ExceptionType>().ToList();
+    private int currentIndex = 0;
+
+    private bool userHasInteracted = false;
+    private bool shouldAnimate = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        await Task.Delay(6000);
+        if (!userHasInteracted)
+        {
+            shouldAnimate = true;
+        }
+    }
+
+    private void CycleExceptionType()
+    {
+        userHasInteracted = true;
+        shouldAnimate = false;
+        currentIndex = (currentIndex + 1) % exceptionTypes.Count;
+        currentException = exceptionTypes[currentIndex];
+        OnExceptionChanged.InvokeAsync(currentException);
+    }
+
+    private string GetCurrentExceptionColor(ExceptionType exceptionType)
+    {
+        return exceptionType switch
+        {
+            ExceptionType.OnPreference => "#8ED973", //"green", //"#8ED973", // Green
+            ExceptionType.OffPreference => "#FFC000", //"#F1A983", // Orange
+            ExceptionType.Constraint => "#FF3300", // "#FF3300", // Red
+            _ => "#BFBFBF", // Default or no exception
+        };
+    }
+    
+    private string GetSymbolForExceptionType(ExceptionType exceptionType)
+    {
+        return exceptionType switch
+        {
+            ExceptionType.OnPreference => "fa-regular fa-face-laugh-beam", // "&#9733;", // Star
+            ExceptionType.OffPreference => "fa-regular fa-face-frown", // Question Mark
+            ExceptionType.Constraint => "fa-regular fa-circle-xmark",      //"&#10006;", // Cross
+            _ => "fa-regular fa-face-smile", // Default case if needed
+        };
+    }
+
+    private string GetForegroundForExceptionType(ExceptionType exceptionType)
+    {
+        return exceptionType switch
+        {
+            // ExceptionType.OffPreference => "black",
+            _ => "#F0F0F0"
+        };
+    }
+
+    [Parameter]
+    public EventCallback<ExceptionType> OnExceptionChanged { get; set; }
+}
+
+<div class="color-picker @(shouldAnimate ? "glow-effect" : "")" 
+     @onclick="CycleExceptionType" 
+     style="background-color:@GetCurrentExceptionColor(currentException); color:@GetForegroundForExceptionType(currentException); font-size: 32px">
+    <i class="@GetSymbolForExceptionType(currentException)"></i>
+</div>

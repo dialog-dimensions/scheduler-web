@@ -1,0 +1,63 @@
+﻿@using System.Globalization
+@using SchedulerWeb.Models.UiModels
+@using SchedulerWeb.Services.RuntimeUtils.Interfaces
+@inject IRuntimeTools RuntimeTools
+@inject NavigationManager NavigationManager
+
+@if (ScheduleData.Count != 0)
+{
+    <div class="schedule-grid">
+        @foreach (var day in ScheduleData)
+        {
+            <div class="day">
+                <h3>@day[0].StartDateTime.Date.ToString("dddd, dd MMMM", _he)</h3>
+                @foreach (var shift in day)
+                {
+                    <div class="shift" style="color: @GetForegroundForGridSlot(shift); border: @GetBorderThicknessForGridSlot(shift)px solid #00D01E;  background-color: @GetColorForGridSlot(shift); " tabindex="0">
+                        @shift.StartDateTime.ToString("HH:mm") - @(shift.Employee?.Name ?? "Unassigned")
+                    </div>
+                }
+            </div>
+        }
+        @* <button class="submit-btn" @onclick="SubmitExceptions">Submit Exceptions</button> *@
+    </div>
+}
+else
+{
+    <p>טוען משמרות...</p>
+}
+
+@code {
+    private int _id;
+    private readonly CultureInfo _he = new("he-IL", true);
+
+    [Parameter]
+    public List<List<GridSlot>> ScheduleData { get; set; } = [];
+    
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var parseId = int.TryParse(await RuntimeTools.TryGetIdAsync(), out _id);
+        if (!parseId)
+        {
+            NavigationManager.NavigateTo("/", true);
+        }
+        
+        await base.OnInitializedAsync();
+    }
+
+    private bool HasShifts => ScheduleData.SelectMany(day => day.Select(s => s)).Any(s => s.Employee?.Id == _id);
+    
+    
+    private string GetColorForGridSlot(GridSlot slot) => 
+        HasShifts ? slot.Employee?.Id == _id ? "#8C8C8C" : "#BFBFBF" : "#FFFFFF";
+
+    private string GetFontWeightForGridSlot(GridSlot slot) => 
+        HasShifts ? slot.Employee?.Id == _id ? "700" : "400" : "400";
+
+    private int GetBorderThicknessForGridSlot(GridSlot slot) => 
+        HasShifts ? slot.Employee?.Id == _id ? 3 : 0 : 1;
+
+    private string GetForegroundForGridSlot(GridSlot slot) => 
+        HasShifts ? slot.Employee?.Id == _id ? "#FFFFFF" : "#CDCDCD" : "#000000";
+}

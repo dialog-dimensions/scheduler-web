@@ -1,0 +1,105 @@
+﻿@using SchedulerWeb.Enums
+@using SchedulerWeb.Models.UiModels
+@using SchedulerWeb.Services.Api.Interfaces
+@using SchedulerWeb.Services.EuiTransform.Interfaces
+@using SchedulerWeb.Services.RuntimeUtils.Interfaces
+@using SchedulerWeb.Models.Entities
+@inject IEuiTransformer Transformer
+@inject IScheduleService ScheduleApiService
+@inject IExceptionService ExceptionApiService
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
+@inject IRuntimeTools RuntimeTools
+
+<ScheduleGrid ScheduleData="@scheduleData" OnExceptionApplied="HandleExceptionApplied" />
+<ColorPicker OnExceptionChanged="HandleExceptionSelected" />
+<SubmitButton OnSubmitted="HandleSubmitted" />
+
+@if (!string.IsNullOrEmpty(_errorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @_errorMessage
+    </div>
+}
+
+@code {
+    private ExceptionType selectedExceptionType = ExceptionType.NoException;
+    private List<List<GridSlot>> scheduleData = [];
+    private string _errorMessage = string.Empty;
+    
+    private bool isSubmitting = false;
+    private bool sumbissionFailed = false;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var parseId = int.TryParse(await JsRuntime.InvokeAsync<string>("localStorage.getItem", "id"), out var userId);
+        if (!parseId)
+        {
+            NavigationManager.NavigateTo("/login?redirect=file", true);
+            return;
+        }
+
+        var token = await RuntimeTools.TryGetValidTokenAsync();
+        if (token is null)
+        {
+            NavigationManager.NavigateTo($"/login?userId={userId}&redirect=file");
+            return;
+        }
+        
+        Schedule? schedule = default;
+
+        try
+        {
+            schedule = await ScheduleApiService.GetScheduleToFileAsync();
+        }
+        catch(HttpRequestException ex)
+        {
+            _errorMessage = ex.Message;
+        }
+        
+        if (schedule is null)
+        {
+            NavigationManager.NavigateTo("/submission-closed", true);
+            return;
+        }
+        
+        var exceptions = await ExceptionApiService.GetExceptionsAsync(schedule!.StartDateTime, userId);
+        if (exceptions is null)
+        {
+            _errorMessage = "Unable to load existing exceptions. Submission may override.";
+            exceptions = new List<ShiftException>();
+        }
+        
+        scheduleData = Transformer.TransformToUiModel(schedule, exceptions);
+    }
+
+    private void HandleExceptionSelected(ExceptionType exceptionType)
+    {
+        selectedExceptionType = exceptionType;
+    }
+
+    
+    private void HandleExceptionApplied(GridSlot slot)
+    {
+        slot.ExceptionType = selectedExceptionType;
+    }
+
+    private async Task HandleSubmitted()
+    {
+        sumbissionFailed = false;
+        var exceptions = await Transformer.TransformToEntityModel(scheduleData);
+        try
+        {
+            isSubmitting = true;
+            await ExceptionApiService.FileExceptionsAsync(exceptions);
+            isSubmitting = false;
+            NavigationManager.NavigateTo("/success-exit", true);
+        }
+        catch
+        {
+            sumbissionFailed = true;
+            throw;
+        }
+    }
+
+}

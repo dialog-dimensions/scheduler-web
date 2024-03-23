@@ -1,0 +1,79 @@
+﻿@using System.Globalization
+@using SchedulerWeb.Enums
+@using SchedulerWeb.Models.UiModels
+
+@if (ScheduleData.Count != 0)
+{
+    <div class="schedule-grid">
+        @foreach (var day in ScheduleData)
+        {
+            <div class="day">
+                <h3>@day[0].StartDateTime.Date.ToString("dddd dd-MM", new CultureInfo("he-IL"))</h3>
+                @foreach (var shift in day)
+                {
+                    <div class="shift" style="background-color: @GetColorForExceptionType(shift.ExceptionType)" @onclick="() => ApplyException(shift)" tabindex="0">
+                        @shift.StartDateTime.ToString("HH:mm")
+                    </div>
+                }
+            </div>
+        }
+        @* <button class="submit-btn" @onclick="SubmitExceptions">Submit Exceptions</button> *@
+    </div>
+}
+else
+{
+    <p>טוען משמרות...</p>
+}
+
+@code {
+    private List<List<GridSlot>> _scheduleData = [];
+    private IEnumerable<GridSlot> _allGridSlots = new List<GridSlot>();
+
+    [Parameter]
+    public List<List<GridSlot>> ScheduleData
+    {
+        get => _scheduleData;
+        set
+        {
+            _scheduleData = value;
+            AllGridSlots = value.SelectMany(day => day.Select(slot => slot));
+        }
+    }
+
+    private IEnumerable<GridSlot> AllGridSlots
+    {
+        get => _allGridSlots;
+        set
+        {
+            _allGridSlots = value;
+            ScheduleDataByTimeOfDay = value.GroupBy(slot => slot.StartDateTime.TimeOfDay);
+        }
+    }
+
+    private IEnumerable<IGrouping<TimeSpan, GridSlot>> ScheduleDataByTimeOfDay { get; set; } = new List<IGrouping<TimeSpan, GridSlot>>();
+
+    
+    
+    [Parameter]
+    public EventCallback<GridSlot> OnExceptionApplied { get; set; }
+
+    private async Task ApplyException(GridSlot slot)
+    {
+        await OnExceptionApplied.InvokeAsync(slot);
+    }
+
+    private string GetColorForExceptionType(ExceptionType exceptionType)
+    {
+        return exceptionType switch
+        {
+            ExceptionType.OnPreference => "#8ED973", // Green
+            ExceptionType.OffPreference => "#FFC000", // Orange
+            ExceptionType.Constraint => "#FF3300", // Red
+            _ => "#BFBFBF", // Default or no exception
+        };
+    }
+    
+    
+    private int HourOfTimeOfDay(TimeSpan timeSpan) => (int)timeSpan.TotalHours;
+    private int MinuteOfTimeOfDay(TimeSpan timeSpan) => (int)((timeSpan.TotalHours - (int)timeSpan.TotalHours) * 60);
+}

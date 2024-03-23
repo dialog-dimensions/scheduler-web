@@ -1,7 +1,49 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.WebUtilities
+@using Microsoft.IdentityModel.Tokens
+@using SchedulerWeb.Services.RuntimeUtils.Interfaces
+@inject NavigationManager NavigationManager
+@inject IRuntimeTools RuntimeTools
+@inject IJwtParser JwtParser
 
 <PageTitle>Home</PageTitle>
 
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
+You will be automatically redirected.
+
+@code{
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = new Uri(NavigationManager.Uri);
+        var hasUriId = QueryHelpers.ParseQuery(uri.Query).TryGetValue("userId", out var id);
+        var token = await RuntimeTools.TryGetValidTokenAsync();
+
+        
+        if (token.IsNullOrEmpty())
+        {
+            NavigationManager.NavigateTo($"/login{(hasUriId ? $"/?userId={id}" : string.Empty)}", true);
+        }
+        else
+        {
+            if (hasUriId)
+            {
+                if (id == JwtParser.GetIdFromToken(token!))
+                {
+                    NavigationManager.NavigateTo("/view/current", true);
+                }
+                else
+                {
+                    NavigationManager.NavigateTo($"login/?userId={id}", true);
+                }
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/view/current", true);
+            }
+        }
+        
+        await base.OnInitializedAsync();
+    }
+}

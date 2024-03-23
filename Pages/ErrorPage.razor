@@ -1,0 +1,11 @@
+﻿@page "/error"
+<h3>שגיאה!</h3>
+
+<div class="mt-3">
+    <a href="@_redirectUrl">נסה שוב</a>.
+</div>
+
+@code {
+    [Parameter] public string Redirect { get; set; } = string.Empty;
+    private string _redirectUrl => $"/{Redirect}";
+}

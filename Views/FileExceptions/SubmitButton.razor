@@ -1,0 +1,15 @@
+﻿@code {
+
+    [Parameter]
+    public EventCallback OnSubmitted { get; set; }
+
+    private void Submit()
+    {
+        OnSubmitted.InvokeAsync();
+    }
+}
+
+<div class="submit-button" 
+     @onclick="Submit">
+    <i class="fa-regular fa-floppy-disk"></i>
+</div>
