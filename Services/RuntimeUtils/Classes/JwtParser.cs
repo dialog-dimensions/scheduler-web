@@ -22,7 +22,7 @@ public class JwtParser : IJwtParser
 
     public bool CurrentlyValid(string token)
     {
-        return ValidThrough(token, DateTime.UtcNow);
+        return ValidThrough(token, DateTime.Now);
     }
 
     public string? GetIdFromToken(string token)
