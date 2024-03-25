@@ -44,6 +44,11 @@ public class ScheduleService : ApiService, IScheduleService
         var response = await Client.GetAsync(uri);
         if (response.IsSuccessStatusCode)
         {
+            if (response.StatusCode == HttpStatusCode.NoContent)
+            {
+                return null;
+            }
+            
             var dto = await response.Content.ReadFromJsonAsync<ScheduleDto>();
             return dto?.ToEntity();
         }
@@ -59,6 +64,11 @@ public class ScheduleService : ApiService, IScheduleService
         var response = await Client.GetAsync(uri);
         if (response.IsSuccessStatusCode)
         {
+            if (response.StatusCode == HttpStatusCode.NoContent)
+            {
+                return null;
+            }
+            
             var dto = await response.Content.ReadFromJsonAsync<ScheduleDto>();
             return dto?.ToEntity();
         }
