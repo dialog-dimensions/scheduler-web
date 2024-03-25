@@ -10,18 +10,169 @@ h1:focus {
 }
 
 a, .btn-link {
-    color: #0071c1;
+    color: #00c171;
 }
 
 .btn-primary {
     color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
+    background-color: #017500;
+    border-color: #000000;
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
     box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
+
+/*.top-menu {*/
+/*    display: grid;*/
+/*    justify-content: end;*/
+/*    list-style-type: none;*/
+/*    margin: 0;*/
+/*    padding: 0;*/
+/*    width: 100%;*/
+/*}*/
+
+/*.top-menu a {*/
+/*    padding: 8px;*/
+/*    text-decoration: none;*/
+/*}*/
+
+/*.top-menu {*/
+/*    display: flex;*/
+/*    flex-direction: column; !* Stack links vertically for mobile *!*/
+/*    align-items: flex-start; !* Center items for better use of space *!*/
+/*    padding: 0;*/
+/*    margin: 0;*/
+/*    background-color: #1b6ec2; !* Dark background for contrast *!*/
+/*}*/
+
+/*.top-menu a {*/
+/*    color: white; !* Light text for readability *!*/
+/*    padding: 10px; !* Ample padding for easy touch interaction *!*/
+/*    text-align: center; !* Center text *!*/
+/*    text-decoration: none;*/
+/*    width: 100%; !* Full width to maximize touch target area *!*/
+/*    box-sizing: border-box; !* Ensure padding doesn't affect width *!*/
+/*}*/
+
+/*!* Adapt layout for larger screens *!*/
+/*@media (min-width: 600px) {*/
+/*    .top-menu {*/
+/*        flex-direction: row; !* Align links horizontally *!*/
+/*        justify-content: flex-start; !* Align to the end for a desktop look *!*/
+/*    }*/
+/*    .top-menu a {*/
+/*        width: auto; !* Auto width for horizontal layout *!*/
+/*    }*/
+/*}*/
+
+/*.menu-container {*/
+/*    position: fixed;*/
+/*    top: 10px;*/
+/*    right: 10px;*/
+/*    z-index: 1000;*/
+/*}*/
+
+/*.menu-container button {*/
+/*    background-color: #007bff;*/
+/*    border: none;*/
+/*    border-radius: 50%;*/
+/*    color: white;*/
+/*    cursor: pointer;*/
+/*    font-size: 20px;*/
+/*    padding: 10px;*/
+/*    margin: 5px;*/
+/*    transition: all 0.3s ease;*/
+/*}*/
+
+/*.menu-container.open button {*/
+/*    background-color: #007bff;*/
+/*}*/
+
+/*.menu-items {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    align-items: center;*/
+/*    padding: 10px;*/
+/*    border-radius: 50px;*/
+/*    background-color: #007bff;*/
+/*    transition: all 0.3s ease;*/
+/*}*/
+
+/*.menu-container.closed .menu-items {*/
+/*    display: none;*/
+/*}*/
+
+/*!* Adjust FontAwesome icons size *!*/
+/*.menu-container i {*/
+/*    font-size: 24px;*/
+/*}*/
+
+.menu-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Ensure items are centered vertically */
+    align-items: center; /* Ensure items are centered horizontally */
+    transition: all 0.5s ease, background-color 0.5s ease;
+    padding: 10px;
+    background-color: rgba(1, 117, 0, 0); /* Adjust color as needed */
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 50px; /* Maintain a circular shape when collapsed */
+    height: 50px; /* Maintain a circular shape when collapsed */
+    border-radius: 50%; /* Circular shape */
+    overflow: hidden;
+}
+
+.menu-toggle, .menu-items button {
+    background-color: #ffffff; /* Icon background */
+    border: 1px solid #017500; /* Border color, matching the menu container */
+    border-radius: 50%; /* Circular border for buttons */
+    color: #017500; /* Icon color, matching the menu container */
+    cursor: pointer;
+    font-size: 20px; /* Adjust icon size as needed */
+    margin: 5px 0; /* Spacing between icons */
+    padding: 10px; /* Padding around icons */
+    width: 40px; /* Fixed width for uniform size */
+    height: 40px; /* Fixed height for uniform size */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.5s ease; /* Smooth transition for icon rotation */
+}
+
+.menu-items {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    max-height: 0; /* Collapse menu */
+    transition: max-height 0.5s ease;
+}
+
+.menu-container.open .menu-items {
+    max-height: 500px; /* Adjust based on content size */
+}
+
+.menu-container.open {
+    padding: 0; /* Adjust padding to maintain the capsule shape */
+    border-radius: 50px; /* Capsule shape when open */
+    height: auto;
+    background-color: rgba(1, 117, 0, 0.5);
+    /* Width and height auto-adjustments are removed to ensure the container size is driven by content and padding */
+}
+
+.menu-items.show {
+    display: flex;
+}
+
+/* Ensure correct display of FontAwesome icons */
+.menu-toggle i, .menu-items i {
+    width: auto;
+    height: auto;
+}
+
 
 .content {
     padding-top: 1.1rem;
@@ -86,7 +237,7 @@ a, .btn-link {
 }
 
 .loading-progress circle:last-child {
-    stroke: #1b6ec2;
+    stroke: #00c171;
     stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
     transition: stroke-dasharray 0.05s ease-in-out;
 }
@@ -187,7 +338,7 @@ a, .btn-link {
     left: 20px;
     bottom: 20px;
     font-size: 32px;
-    background-color: #0C769E;
+    background-color: #00c171;
     border-radius: 5px;
     height: 48px;
     width: 48px;
@@ -206,7 +357,7 @@ a, .btn-link {
 /*HINT ANIMATION*/
 @keyframes glow {
     0% { box-shadow: 0 0 5px rgba(0, 0, 0, 0); }
-    50% { box-shadow: 0 0 20px rgba(12, 118, 158, 0.7); }
+    50% { box-shadow: 0 0 20px rgb(12, 118, 158); }
     100% { box-shadow: 0 0 5px rgba(0, 0, 0, 0); }
 }
 
