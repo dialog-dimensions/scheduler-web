@@ -16,7 +16,7 @@
 
 <h3>@_title</h3>
 <div class="mt-3">
-    <a href="@_otherScheduleRedirect">@_otherScheduleText</a>.
+    <a href="@_otherScheduleRedirect">@_otherScheduleText</a>
 </div>
 
 <ScheduleGrid ScheduleData="@scheduleData"/>
@@ -45,7 +45,7 @@
 
         if (schedule is null)
         {
-            NavigationManager.NavigateTo("/", true);
+            NavigationManager.NavigateTo($"/error?redirect=view/{Which}", true);
             return;
         }
         
