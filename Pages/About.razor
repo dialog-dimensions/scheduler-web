@@ -1,0 +1,41 @@
+﻿@inject NavigationManager NavigationManager
+
+@page "/about"
+@using Microsoft.AspNetCore.WebUtilities
+<h3>למה בדיוק אני נרשם?</h3>
+תהליך השיבוץ האוטומטי שלנו מאופיין בחדשנות ופשטות, כשהמטרה היא להבטיח התאמה אופטימלית בין העדפות העובדים, שיוויון בין עמיתים וצרכי הארגון.
+התהליך מתחיל בהגדרת תקופת זמן מוגדרת לפני סיום הלו"ז הנוכחי, כדי לאפשר לעובדים זמן מספיק להגיש את מגבלותיהם והעדפותיהם.
+לאחר מכן, המערכת אוספת את הנתונים, מעבדת אותם באופן אוטומטי ויוצרת הצעת לו"ז חדשה, שתספק את התוצאה הטובה ביותר לכולם.
+המנהלים יכולים לעיין, לשכלל ולאשר את הלו"ז המוצע לפני פרסומו.
+זה מבטיח שכל עובד יקבל את המשמרות המתאימות לו ביותר תוך התחשבות בצרכי הארגון, וכל זאת באופן שקוף, יעיל וחסכוני בזמן.
+ניהול המשתמשים מאובטח על ידי פרוטוקול האבטחה של מיקרוסופט במתכונתו העדכנית ביותר, ופרטיכם האישיים לא ישומשו לאף צורך מלבד השימוש בשירות.
+
+<h3>למה צריך חשבון משתמש?</h3>
+יצירת חשבון על ידי העובדים היא הכרחית לאימות ואישור הגישה, גם לצורך אמינות הנתונים שנשלחים וגם לאימות הרשאות לגישה ועריכה של נתונים במסד הנתונים.
+חשבון משמש כאמצעי להבטיח שהמידע הנשלח מיוחס באופן מדויק לעובד הנכון ומאפשר גישה מאובטחת לנתונים ולתהליכים הרלוונטיים במערכת.
+
+<div class="mt-3">
+    <a href="@AboutSecurityUri">פירוט שכבות אבטחת המידע בפרויקט</a>
+</div>
+<div class="mt-3">
+    <a href="@ProceedUri">המשך</a>
+</div>
+
+@code {
+
+    private string ProceedUri => RedirectUri;
+    private string AboutSecurityUri => $"/about-security?redirect={RedirectUri}";
+    private string RedirectUri { get; set; } = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        var uri = new Uri(NavigationManager.Uri);
+        var hasUriRedirect = QueryHelpers.ParseQuery(uri.Query).TryGetValue("redirect", out var redirect);
+
+        if (hasUriRedirect)
+        {
+            RedirectUri = redirect!;
+        }
+    }
+
+}
