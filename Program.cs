@@ -24,6 +24,7 @@ builder.Services.AddTransient<IJwtParser, JwtParser>();
 builder.Services.AddTransient<IJsRegistry, JsRegistry>();
 builder.Services.AddTransient<IRuntimeTools, RuntimeTools>();
 
+
 var culture = new CultureInfo("he-IL");
 CultureInfo.DefaultThreadCurrentCulture = culture;
 CultureInfo.DefaultThreadCurrentUICulture = culture;

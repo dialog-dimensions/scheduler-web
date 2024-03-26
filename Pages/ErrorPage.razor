@@ -1,18 +1,26 @@
 ﻿@page "/error"
 @using Microsoft.AspNetCore.WebUtilities
+@using SchedulerWeb.Services.RuntimeUtils.Interfaces
 @inject NavigationManager NavigationManager
+@inject IRuntimeTools RuntimeTools
 <h3>שגיאה!</h3>
 
 <div class="mt-3">
-    <a href="@RedirectUrl">נסה שוב</a>
+    <a href="@Redirect">נסה שוב</a>
+</div>
+
+<div class="mt-3">
+    <a href="@HomePage">בחזרה לחוף מבטחים</a>
 </div>
 
 @code {
     [Parameter] public string Redirect { get; set; } = string.Empty;
-    private string RedirectUrl => $"/{Redirect}";
+    private string HomePage { get; set; }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        HomePage = await RuntimeTools.GetHomePageUriAsync();
+        
         var uri = new Uri(NavigationManager.Uri);
         var hasUriRedirect = QueryHelpers.ParseQuery(uri.Query).TryGetValue("redirect", out var redirect);
 

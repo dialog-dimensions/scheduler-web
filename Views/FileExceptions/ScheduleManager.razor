@@ -32,6 +32,8 @@
     
     protected override async Task OnInitializedAsync()
     {
+        await RuntimeTools.RegisterHomePageUriAsync("file");
+        
         var parseId = int.TryParse(await JsRuntime.InvokeAsync<string>("localStorage.getItem", "id"), out var userId);
         if (!parseId)
         {

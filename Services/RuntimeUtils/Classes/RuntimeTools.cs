@@ -22,14 +22,10 @@ public class RuntimeTools : IRuntimeTools
         {
             return null;
         }
-
-        if (!_jwtParser.CurrentlyValid(token))
-        {
-            await RegisterTokenAsync(string.Empty);
-            return string.Empty;
-        }
-
-        return token;
+        
+        if (_jwtParser.CurrentlyValid(token)) return token;
+        await RegisterTokenAsync(string.Empty);
+        return string.Empty;
     }
 
     public async Task<string?> TryGetIdAsync()
@@ -37,7 +33,12 @@ public class RuntimeTools : IRuntimeTools
         return await _jsRegistry.FetchItemAsync<string>("id");
     }
 
-
+    public async Task<string> GetHomePageUriAsync()
+    {
+        return await _jsRegistry.FetchItemAsync<string>("homePageUri");
+    }
+    
+    
     public async Task RegisterTokenAsync(string token)
     {
         await _jsRegistry.RegisterItemAsync("authToken", token);
@@ -46,5 +47,10 @@ public class RuntimeTools : IRuntimeTools
     public async Task RegisterIdAsync(string id)
     {
         await _jsRegistry.RegisterItemAsync("id", id);
+    }
+
+    public async Task RegisterHomePageUriAsync(string uri)
+    {
+        await _jsRegistry.RegisterItemAsync("homePageUri", uri);
     }
 }

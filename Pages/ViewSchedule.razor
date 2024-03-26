@@ -56,6 +56,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await RuntimeTools.RegisterHomePageUriAsync("view");
+        
         var validToken = await RuntimeTools.TryGetValidTokenAsync();
         var memoryId = await RuntimeTools.TryGetIdAsync();
         
