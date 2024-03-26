@@ -76,6 +76,13 @@
 
     private async Task HandleRegistration()
     {
+        var validationErrors = ValidationErrors().ToList();
+        if (validationErrors.Any())
+        {
+            _errorMessage = string.Join("\n", validationErrors);
+            return;
+        }
+        
         _errorMessage = string.Empty;
         
         var result = await AuthService.RegisterAsync(registration.Id, registration.UserName, registration.PhoneNumber, 
@@ -91,4 +98,36 @@
             _errorMessage = result;
         }
     }
+    
+    private IEnumerable<string> ValidationErrors()
+    {
+        var password = registration.Password;
+        var name = registration.UserName;
+        var result = new List<string>();
+        
+        if (password.Length < 6)
+        {
+            result.Add("Password must be at least 6 characters");
+        }
+        if (password == password.ToLower())
+        {
+            result.Add("Password must contain at least one uppercase letter");
+        }
+        if (password == password.ToUpper())
+        {
+            result.Add("Password must contain at least one lowercase letter");
+        }
+        if (!password.Intersect(Digits).Any())
+        {
+            result.Add("Password must contain at least one digit");
+        }
+        if (name.Contains(" "))
+        {
+            result.Add("Username must be a single word");
+        }
+
+        return result;
+    }
+
+    private const string Digits = "1234567890";
 }
