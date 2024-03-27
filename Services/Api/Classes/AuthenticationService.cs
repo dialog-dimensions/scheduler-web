@@ -34,12 +34,11 @@ public class AuthenticationService : IAuthenticationService
         return false;
     }
 
-    public async Task<string?> RegisterAsync(string id, string name, string phone, string password, string confirmPassword)
+    public async Task<string?> RegisterAsync(string id, string phone, string password, string confirmPassword)
     {
         var model = new RegistrationModel
         {
-            Id = id, 
-            UserName = name, 
+            Id = id,
             PhoneNumber = phone, 
             Password = password, 
             ConfirmPassword = confirmPassword
