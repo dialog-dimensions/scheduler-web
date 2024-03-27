@@ -10,7 +10,7 @@ using SchedulerWeb.Services.RuntimeUtils.Classes;
 using SchedulerWeb.Services.RuntimeUtils.Interfaces;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
-builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 

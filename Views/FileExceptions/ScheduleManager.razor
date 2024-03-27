@@ -10,8 +10,9 @@
 @inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager
 @inject IRuntimeTools RuntimeTools
+@inject IConfiguration Configuration
 
-<ScheduleGrid ScheduleData="@scheduleData" OnExceptionApplied="HandleExceptionApplied" />
+<ScheduleGrid ScheduleData="@ScheduleData" OnExceptionApplied="HandleExceptionApplied" />
 <ColorPicker OnExceptionChanged="HandleExceptionSelected" />
 <SubmitButton OnSubmitted="HandleSubmitted" />
 
@@ -23,12 +24,29 @@
 }
 
 @code {
-    private ExceptionType selectedExceptionType = ExceptionType.NoException;
-    private List<List<GridSlot>> scheduleData = [];
+    private ExceptionType _selectedExceptionType = ExceptionType.NoException;
+
+    private List<List<GridSlot>> _scheduleData = [];
+
+    private List<List<GridSlot>> ScheduleData
+    {
+        get => _scheduleData;
+        set
+        {
+            var allShifts = value.SelectMany(day => day.Select(g => g)).ToList();
+            _scheduleData = value;
+            _maxNumOfConstraints = allShifts.Count * Configuration.GetValue<double>("Params:File:Constraints:MaxPct");
+            _constraintsFiled = allShifts.Count(shift => shift.ExceptionType == ExceptionType.Constraint);
+        }
+    }
+    
     private string _errorMessage = string.Empty;
     
-    private bool isSubmitting = false;
-    private bool sumbissionFailed = false;
+    private int _constraintsFiled = 0;
+    private double _maxNumOfConstraints = 0.0;
+    
+    private bool _isSubmitting = false;
+    private bool _submissionFailed = false;
     
     protected override async Task OnInitializedAsync()
     {
@@ -65,41 +83,55 @@
             return;
         }
         
-        var exceptions = await ExceptionApiService.GetExceptionsAsync(schedule!.StartDateTime, userId);
+        var exceptions = await ExceptionApiService.GetExceptionsAsync(schedule.StartDateTime, userId);
         if (exceptions is null)
         {
             _errorMessage = "Unable to load existing exceptions. Submission may override.";
             exceptions = new List<ShiftException>();
         }
         
-        scheduleData = Transformer.TransformToUiModel(schedule, exceptions);
+        ScheduleData = Transformer.TransformToUiModel(schedule, exceptions);
     }
 
     private void HandleExceptionSelected(ExceptionType exceptionType)
     {
-        selectedExceptionType = exceptionType;
+        _selectedExceptionType = exceptionType;
     }
 
     
     private void HandleExceptionApplied(GridSlot slot)
     {
-        slot.ExceptionType = selectedExceptionType;
+        if (_selectedExceptionType == ExceptionType.Constraint && _constraintsFiled >= _maxNumOfConstraints)
+        {
+            return;
+        }
+
+        if (_selectedExceptionType != ExceptionType.Constraint && slot.ExceptionType == ExceptionType.Constraint)
+        {
+            _constraintsFiled--;
+        }
+        
+        slot.ExceptionType = _selectedExceptionType;
+        if (_selectedExceptionType == ExceptionType.Constraint)
+        {
+            _constraintsFiled++;
+        }
     }
 
     private async Task HandleSubmitted()
     {
-        sumbissionFailed = false;
-        var exceptions = await Transformer.TransformToEntityModel(scheduleData);
+        _submissionFailed = false;
+        var exceptions = await Transformer.TransformToEntityModel(ScheduleData);
         try
         {
-            isSubmitting = true;
+            _isSubmitting = true;
             await ExceptionApiService.FileExceptionsAsync(exceptions);
-            isSubmitting = false;
+            _isSubmitting = false;
             NavigationManager.NavigateTo("/success-exit", true);
         }
         catch
         {
-            sumbissionFailed = true;
+            _submissionFailed = true;
             throw;
         }
     }
