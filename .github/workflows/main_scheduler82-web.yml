@@ -30,7 +30,7 @@ jobs:
 
       - name: Update CSS Version with Commit Hash
         run: |
-          $COMMIT_HASH="${{ github.sha.substring(0,7) }}"
+          $COMMIT_HASH = "${{ github.sha }}".Substring(0,7)
           $path = "${{env.DOTNET_ROOT}}/myapp/wwwroot/index.html"
           $content = Get-Content $path -Raw
           $content = $content -replace 'href="css/app.css"', "href=`"css/app.css?v=$COMMIT_HASH`""
