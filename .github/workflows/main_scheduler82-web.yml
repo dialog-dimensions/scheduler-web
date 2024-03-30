@@ -31,7 +31,7 @@ jobs:
       - name: Update CSS Version with Commit Hash
         run: |
           COMMIT_HASH=${GITHUB_SHA:0:7}
-          sed -i "s|href=\"css/app.css\"|href=\"css/app.css?v=$COMMIT_HASH\"|g" ./publish/wwwroot/index.html
+          sed -i "s|href=\"css/app.css\"|href=\"css/app.css?v=$COMMIT_HASH\"|g" ${{env.DOTNET_ROOT}}/myapp/wwwroot/index.html
         shell: bash
 
       - name: Upload artifact for deployment job
