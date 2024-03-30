@@ -4,6 +4,7 @@
 @using SchedulerWeb.Services.EuiTransform.Interfaces
 @using SchedulerWeb.Services.RuntimeUtils.Interfaces
 @using SchedulerWeb.Models.Entities
+@using SchedulerWeb.Views.UIComponents
 @inject IEuiTransformer Transformer
 @inject IScheduleService ScheduleApiService
 @inject IExceptionService ExceptionApiService
@@ -15,6 +16,7 @@
 <ScheduleGrid ScheduleData="@ScheduleData" OnExceptionApplied="HandleExceptionApplied" />
 <ColorPicker OnExceptionChanged="HandleExceptionSelected" />
 <SubmitButton OnSubmitted="HandleSubmitted" />
+<Modal Message="@modalMessage" IsVisible="@showModal" IsVisibleChanged="HandleModalVisibilityChange"/>
 
 @if (!string.IsNullOrEmpty(_errorMessage))
 {
@@ -22,8 +24,11 @@
         @_errorMessage
     </div>
 }
-
 @code {
+    private bool showModal = false;
+
+    private string modalMessage => $"ניתן להזין עד {_maxNumOfConstraints} אילוצים אדומים.";
+    
     private ExceptionType _selectedExceptionType = ExceptionType.NoException;
 
     private List<List<GridSlot>> _scheduleData = [];
@@ -35,7 +40,7 @@
         {
             var allShifts = value.SelectMany(day => day.Select(g => g)).ToList();
             _scheduleData = value;
-            _maxNumOfConstraints = allShifts.Count * Configuration.GetValue<double>("Params:File:Constraints:MaxPct");
+            _maxNumOfConstraints = (int)(allShifts.Count * Configuration.GetValue<double>("Params:File:Constraints:MaxPct"));
             _constraintsFiled = allShifts.Count(shift => shift.ExceptionType == ExceptionType.Constraint);
         }
     }
@@ -43,7 +48,7 @@
     private string _errorMessage = string.Empty;
     
     private int _constraintsFiled = 0;
-    private double _maxNumOfConstraints = 0.0;
+    private int _maxNumOfConstraints = 0;
     
     private bool _isSubmitting = false;
     private bool _submissionFailed = false;
@@ -101,8 +106,9 @@
     
     private void HandleExceptionApplied(GridSlot slot)
     {
-        if (_selectedExceptionType == ExceptionType.Constraint && _constraintsFiled >= _maxNumOfConstraints)
+        if (_selectedExceptionType == ExceptionType.Constraint && _constraintsFiled >= _maxNumOfConstraints && slot.ExceptionType != ExceptionType.Constraint)
         {
+            showModal = true;
             return;
         }
 
@@ -135,5 +141,10 @@
             throw;
         }
     }
-
+    
+    private async Task HandleModalVisibilityChange(bool isVisible)
+    {
+        showModal = isVisible;
+        // Additional logic if needed when the modal visibility changes
+    }
 }
