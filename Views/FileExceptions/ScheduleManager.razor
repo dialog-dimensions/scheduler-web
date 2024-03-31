@@ -106,22 +106,31 @@
     
     private void HandleExceptionApplied(GridSlot slot)
     {
-        if (_selectedExceptionType == ExceptionType.Constraint && _constraintsFiled >= _maxNumOfConstraints && slot.ExceptionType != ExceptionType.Constraint)
+        if (_selectedExceptionType == slot.ExceptionType)
         {
-            showModal = true;
             return;
         }
 
-        if (_selectedExceptionType != ExceptionType.Constraint && slot.ExceptionType == ExceptionType.Constraint)
+        if (slot.ExceptionType == ExceptionType.Constraint)
         {
             _constraintsFiled--;
         }
-        
-        slot.ExceptionType = _selectedExceptionType;
-        if (_selectedExceptionType == ExceptionType.Constraint)
+
+        else
         {
-            _constraintsFiled++;
+            if (_selectedExceptionType == ExceptionType.Constraint)
+            {
+                if (_constraintsFiled == _maxNumOfConstraints)
+                {
+                    showModal = true;
+                    return;
+                }
+                
+                _constraintsFiled++;
+            }
         }
+
+        slot.ExceptionType = _selectedExceptionType;
     }
 
     private async Task HandleSubmitted()
@@ -145,6 +154,5 @@
     private async Task HandleModalVisibilityChange(bool isVisible)
     {
         showModal = isVisible;
-        // Additional logic if needed when the modal visibility changes
     }
 }
