@@ -437,7 +437,7 @@ a, .btn-link {
     padding: 20px;
     border: 1px solid #888;
     width: 80%; /* You might want to adjust this */
-    height: 160px;
+    height: 240px;
     max-width: 500px; /* Maximum width */
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19); /* Add some shadow */
 }

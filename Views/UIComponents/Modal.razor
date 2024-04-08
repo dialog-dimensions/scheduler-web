@@ -3,7 +3,8 @@
     <div class="modal">
         <div class="modal-content">
             <p>@Message</p>
-            <button @onclick="OnConfirm">הבנתי</button>
+            <button @onclick="OnConfirm">הבנתי, רוצה להגיש</button>
+            <button @onclick="OnAbort">בחזרה לעריכת ההגשה</button>
         </div>
     </div>
 }
@@ -18,9 +19,20 @@
     [Parameter]
     public EventCallback<bool> IsVisibleChanged { get; set; }
 
+    [Parameter] 
+    public EventCallback<bool> SubmissionRequested { get; set; }
+
+    private async Task OnAbort()
+    {
+        IsVisible = false;
+        await IsVisibleChanged.InvokeAsync(IsVisible);
+        await SubmissionRequested.InvokeAsync(false);
+    }
+    
     private async Task OnConfirm()
     {
         IsVisible = false;
         await IsVisibleChanged.InvokeAsync(IsVisible);
+        await SubmissionRequested.InvokeAsync(true);
     }
 }

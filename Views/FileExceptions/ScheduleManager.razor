@@ -15,8 +15,8 @@
 
 <ScheduleGrid ScheduleData="@ScheduleData" OnExceptionApplied="HandleExceptionApplied" />
 <ColorPicker OnExceptionChanged="HandleExceptionSelected" />
-<SubmitButton OnSubmitted="HandleSubmitted" />
-<Modal Message="@modalMessage" IsVisible="@showModal" IsVisibleChanged="HandleModalVisibilityChange"/>
+<SubmitButton OnSubmitted="HandleSaveClicked" ExcessiveConstraints="@ExcessiveConstraints"/>
+<Modal Message="@modalMessage" IsVisible="@showModal" IsVisibleChanged="HandleModalVisibilityChange" SubmissionRequested="HandleSubmissionRequested"/>
 
 @if (!string.IsNullOrEmpty(_errorMessage))
 {
@@ -27,7 +27,9 @@
 @code {
     private bool showModal = false;
 
-    private string modalMessage => $"ניתן להזין עד {_maxNumOfConstraints} אילוצים אדומים.";
+    private string modalMessage => $"בהזנה של יותר מ {_maxNumOfConstraints} אילוצים אדומים, הנך עלול לרדת למתכונת שכר נמוכה לשבוע הבא.";
+
+    private bool ExcessiveConstraints => _constraintsFiled > _maxNumOfConstraints;
     
     private ExceptionType _selectedExceptionType = ExceptionType.NoException;
 
@@ -116,18 +118,9 @@
             _constraintsFiled--;
         }
 
-        else
+        else if (_selectedExceptionType == ExceptionType.Constraint)
         {
-            if (_selectedExceptionType == ExceptionType.Constraint)
-            {
-                if (_constraintsFiled == _maxNumOfConstraints)
-                {
-                    showModal = true;
-                    return;
-                }
-                
-                _constraintsFiled++;
-            }
+            _constraintsFiled++;
         }
 
         slot.ExceptionType = _selectedExceptionType;
@@ -150,9 +143,26 @@
             throw;
         }
     }
+
+    private async Task HandleSaveClicked()
+    {
+        if (ExcessiveConstraints)
+        {
+            showModal = true;
+            return;
+        }
+
+        await HandleSubmissionRequested(true);
+    }
     
     private async Task HandleModalVisibilityChange(bool isVisible)
     {
         showModal = isVisible;
+    }
+
+    private async Task HandleSubmissionRequested(bool requested)
+    {
+        if (!requested) return;
+        await HandleSubmitted();
     }
 }
