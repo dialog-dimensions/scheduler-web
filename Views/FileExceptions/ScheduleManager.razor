@@ -16,7 +16,7 @@
 <ScheduleGrid ScheduleData="@ScheduleData" OnExceptionApplied="HandleExceptionApplied" />
 <ColorPicker OnExceptionChanged="HandleExceptionSelected" />
 <SubmitButton OnSubmitted="HandleSaveClicked" ExcessiveConstraints="@ExcessiveConstraints"/>
-<Modal Message="@modalMessage" IsVisible="@showModal" IsVisibleChanged="HandleModalVisibilityChange" SubmissionRequested="HandleSubmissionRequested"/>
+<Modal Message="@ModalMessage" IsVisible="@_showModal" IsVisibleChanged="HandleModalVisibilityChange" SubmissionRequested="HandleSubmissionRequested"/>
 
 @if (!string.IsNullOrEmpty(_errorMessage))
 {
@@ -25,9 +25,12 @@
     </div>
 }
 @code {
-    private bool showModal = false;
+    [Parameter] 
+    public string DeskId { get; set; } = "";
+    
+    private bool _showModal = false;
 
-    private string modalMessage => $"בהזנה של יותר מ {_maxNumOfConstraints} אילוצים אדומים, הנך עלול לרדת למתכונת שכר נמוכה לשבוע הבא.";
+    private string ModalMessage => $"בהזנה של יותר מ {_maxNumOfConstraints} אילוצים אדומים, הנך עלול לרדת למתכונת שכר נמוכה לשבוע הבא.";
 
     private bool ExcessiveConstraints => _constraintsFiled > _maxNumOfConstraints;
     
@@ -97,7 +100,7 @@
             exceptions = new List<ShiftException>();
         }
         
-        ScheduleData = Transformer.TransformToUiModel(schedule, exceptions);
+        ScheduleData = Transformer.TransformToUiModel(schedule, shiftExceptions);
     }
 
     private void HandleExceptionSelected(ExceptionType exceptionType)
@@ -148,7 +151,7 @@
     {
         if (ExcessiveConstraints)
         {
-            showModal = true;
+            _showModal = true;
             return;
         }
 
@@ -157,7 +160,7 @@
     
     private async Task HandleModalVisibilityChange(bool isVisible)
     {
-        showModal = isVisible;
+        _showModal = isVisible;
     }
 
     private async Task HandleSubmissionRequested(bool requested)

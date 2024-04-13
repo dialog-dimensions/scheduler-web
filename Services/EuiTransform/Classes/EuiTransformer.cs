@@ -6,7 +6,7 @@ using SchedulerWeb.Services.EuiTransform.Interfaces;
 
 namespace SchedulerWeb.Services.EuiTransform.Classes;
 
-public class EuiTransformer : IEuiTransformer
+public class EuiTransformer(IJSRuntime jsRuntime) : IEuiTransformer
 {
     private readonly IJSRuntime _jsRuntime;
 
@@ -41,7 +41,7 @@ public class EuiTransformer : IEuiTransformer
 
     public async Task<List<ShiftException>> TransformToEntityModel(List<List<GridSlot>> grid)
     {
-        var parseId = int.TryParse(await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "id"), out var userId);
+        var parseId = int.TryParse(await jsRuntime.InvokeAsync<string>("localStorage.getItem", "id"), out var userId);
         if (!parseId)
         {
             return [];

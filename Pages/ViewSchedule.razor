@@ -23,12 +23,16 @@
 
 @code {
     [Parameter] 
-    public string Which { get; set; }
-    private List<List<GridSlot>> scheduleData = [];
+    public string Which { get; set; } = "";
+
+    [Parameter] 
+    public string DeskId { get; set; } = "";
+
+    private List<List<GridSlot>> _scheduleData = [];
     
-    private string _otherScheduleRedirect => $"/view/{(Which is "next" ? "current" : "next")}";
-    private string _otherScheduleText => Which is "next" ? "צפה בשבוע הנוכחי" : "צפה בשבוע הבא";
-    private string _title => Which is "next" ? "משמרות השבוע הבא" : "משמרות השבוע הנוכחי";
+    private string OtherScheduleRedirect => $"/view/{DeskId}/{(Which is "next" ? "current" : "next")}";
+    private string OtherScheduleText => Which is "next" ? "צפה בשבוע הנוכחי" : "צפה בשבוע הבא";
+    private string Title => Which is "next" ? "משמרות השבוע הבא" : "משמרות השבוע הנוכחי";
     
     protected override async Task OnParametersSetAsync()
     {
@@ -49,7 +53,7 @@
             return;
         }
         
-        scheduleData = EuiTransformer.TransformToViewModel(schedule);
+        _scheduleData = EuiTransformer.TransformToViewModel(schedule);
         
         await base.OnParametersSetAsync();
     }

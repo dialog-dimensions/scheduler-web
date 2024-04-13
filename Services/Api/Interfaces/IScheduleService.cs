@@ -4,7 +4,7 @@ namespace SchedulerWeb.Services.Api.Interfaces;
 
 public interface IScheduleService
 {
-    Task<Schedule?> GetScheduleToFileAsync();
-    Task<Schedule?> GetCurrentScheduleAsync();
-    Task<Schedule?> GetNextScheduleAsync();
+    Task<Schedule?> GetScheduleToFileAsync(string deskId);
+    Task<Schedule?> GetCurrentScheduleAsync(string deskId);
+    Task<Schedule?> GetNextScheduleAsync(string deskId);
 }

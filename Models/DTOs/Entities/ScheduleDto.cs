@@ -12,7 +12,15 @@ public class ScheduleDto : List<ShiftDto>, IDto<Schedule, ScheduleDto>
         ? (int)double.Round(EndDateTime!.Value.Subtract(StartDateTime!.Value).TotalHours / Count)
         : null;
 
+    public DateTime StartDateTime => FirstShift.StartDateTime;
+    public DateTime EndDateTime => LastShift.EndDateTime;
+    public int ShiftDuration => (int)(Duration.TotalHours / Count);
     public bool IsFullyScheduled => this.All(shift => shift.Employee is not null);
+    
+    private ShiftDto FirstShift => this.MinBy(s => s.StartDateTime)!;
+    private ShiftDto LastShift => this.MaxBy(s => s.StartDateTime)!;
+    private ShiftDto SomeShift => this[0];
+    private TimeSpan Duration => EndDateTime.Subtract(StartDateTime);
     
     public static ScheduleDto FromEntity(Schedule entity)
     {
@@ -34,7 +42,7 @@ public class ScheduleDto : List<ShiftDto>, IDto<Schedule, ScheduleDto>
         {
             StartDateTime = shiftDto.StartDateTime,
             EndDateTime = shiftDto.EndDateTime,
-            ScheduleKey = StartDateTime!.Value,
+            ScheduleStart = StartDateTime,
             Employee = shiftDto.Employee?.ToEntity()
         }));
 

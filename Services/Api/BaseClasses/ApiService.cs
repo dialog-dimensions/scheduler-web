@@ -6,17 +6,17 @@ namespace SchedulerWeb.Services.Api.BaseClasses;
 public abstract class ApiService
 {
     protected readonly HttpClient Client;
-    protected readonly IJSRuntime JsRuntime;
+    private readonly IJSRuntime _jsRuntime;
 
     protected ApiService(HttpClient client, IJSRuntime jsRuntime)
     {
         Client = client;
-        JsRuntime = jsRuntime;
+        _jsRuntime = jsRuntime;
     }
 
     protected async Task ConfigureAsync()
     {
-        var token = await JsRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+        var token = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
         Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
     }
 }

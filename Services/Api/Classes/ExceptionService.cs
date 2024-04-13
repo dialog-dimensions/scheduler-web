@@ -9,25 +9,19 @@ using SchedulerWeb.Services.Api.Interfaces;
 
 namespace SchedulerWeb.Services.Api.Classes;
 
-public class ExceptionService : ApiService, IExceptionService
+public class ExceptionService(HttpClient client, IJSRuntime jsRuntime)
+    : ApiService(client, jsRuntime), IExceptionService
 {
-    public ExceptionService(HttpClient client, IJSRuntime jsRuntime) : base(client, jsRuntime)
-    {
-    }
-    
-    public async Task<IEnumerable<ShiftException>?> GetExceptionsAsync(DateTime scheduleKey, int employeeId)
+    public async Task<IEnumerable<ShiftException>?> GetExceptionsAsync(string deskId, DateTime scheduleStart, int employeeId)
     {
         await ConfigureAsync();
         
         var uri = $"api/ShiftException/{scheduleKey:s}/{employeeId}";
         var response = await Client.GetAsync(uri);
-        if (response.IsSuccessStatusCode)
-        {
-            var dtos = await response.Content.ReadFromJsonAsync<IEnumerable<ShiftExceptionDto>>();
-            return dtos?.Select(dto => dto.ToEntity()) ?? new List<ShiftException>();
-        }
+        if (!response.IsSuccessStatusCode) return null;
+        var dtos = await response.Content.ReadFromJsonAsync<IEnumerable<ShiftExceptionDto>>();
+        return dtos?.Select(dto => dto.ToEntity()) ?? new List<ShiftException>();
 
-        return null;
     }
 
     public async Task<bool> FileExceptionsAsync(IEnumerable<ShiftException> exceptions)

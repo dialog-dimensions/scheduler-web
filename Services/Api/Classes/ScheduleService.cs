@@ -8,32 +8,23 @@ using SchedulerWeb.Services.Api.Interfaces;
 
 namespace SchedulerWeb.Services.Api.Classes;
 
-public class ScheduleService : ApiService, IScheduleService
+public class ScheduleService(IJSRuntime jsRuntime, HttpClient client) : ApiService(client, jsRuntime), IScheduleService
 {
-    public ScheduleService(IJSRuntime jsRuntime, HttpClient client) : base(client, jsRuntime)
-    {
-
-    }
-    
-    
-    public async Task<Schedule?> GetScheduleToFileAsync()
+    public async Task<Schedule?> GetScheduleToFileAsync(string deskId)
     {
         await ConfigureAsync();
         
         const string uri = "api/Schedule/NearestIncomplete";
         var response = await Client.GetAsync(uri);
-        if (response.IsSuccessStatusCode)
+        if (!response.IsSuccessStatusCode) throw new HttpRequestException("Unable to retrieve schedule.");
+        if (response.StatusCode == HttpStatusCode.NoContent)
         {
-            if (response.StatusCode == HttpStatusCode.NoContent)
-            {
-                return null;
-            }
-            
-            var dto = await response.Content.ReadFromJsonAsync<FlatScheduleDto>();
-            return dto?.ToEntity();
+            return null;
         }
+            
+        var dto = await response.Content.ReadFromJsonAsync<FlatScheduleDto>();
+        return dto?.ToEntity();
 
-        throw new HttpRequestException("Unable to retrieve schedule.");
     }
 
     public async Task<Schedule?> GetCurrentScheduleAsync()
@@ -42,37 +33,34 @@ public class ScheduleService : ApiService, IScheduleService
 
         const string uri = "api/Schedule/Current";
         var response = await Client.GetAsync(uri);
-        if (response.IsSuccessStatusCode)
+        if (!response.IsSuccessStatusCode)
         {
-            if (response.StatusCode == HttpStatusCode.NoContent)
-            {
-                return null;
-            }
-            
-            var dto = await response.Content.ReadFromJsonAsync<ScheduleDto>();
-            return dto?.ToEntity();
+            throw new HttpRequestException("Unable to retrieve schedule.");
         }
         
-        throw new HttpRequestException("Unable to retrieve schedule.");
+        if (response.StatusCode == HttpStatusCode.NoContent)
+        {
+            return null;
+        }
+            
+        var dto = await response.Content.ReadFromJsonAsync<ScheduleDto>();
+        return dto?.ToEntity();
     }
 
-    public async Task<Schedule?> GetNextScheduleAsync()
+    public async Task<Schedule?> GetNextScheduleAsync(string deskId)
     {
         await ConfigureAsync();
 
         const string uri = "api/Schedule/Next";
         var response = await Client.GetAsync(uri);
-        if (response.IsSuccessStatusCode)
+        if (!response.IsSuccessStatusCode) throw new HttpRequestException("Unable to retrieve schedule.");
+        if (response.StatusCode == HttpStatusCode.NoContent)
         {
-            if (response.StatusCode == HttpStatusCode.NoContent)
-            {
-                return null;
-            }
-            
-            var dto = await response.Content.ReadFromJsonAsync<ScheduleDto>();
-            return dto?.ToEntity();
+            return null;
         }
+            
+        var dto = await response.Content.ReadFromJsonAsync<ScheduleDto>();
+        return dto?.ToEntity();
 
-        throw new HttpRequestException("Unable to retrieve schedule.");
     }
 }
