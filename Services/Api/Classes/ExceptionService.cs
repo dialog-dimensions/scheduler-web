@@ -34,4 +34,15 @@ public class ExceptionService(HttpClient client, IJSRuntime jsRuntime)
         var response = await Client.PostAsync(uri, content);
         return response.IsSuccessStatusCode;
     }
+
+    public async Task<bool> PutExceptionsAsync(string deskId, DateTime scheduleStart, int employeeId, IEnumerable<ShiftException> exceptions)
+    {
+        await ConfigureAsync();
+
+        var uri = $"api/ShiftException/{deskId}/{scheduleStart:s}/{employeeId}";
+        var dtos = exceptions.Select(ShiftExceptionDto.FromEntity).ToList();
+        var content = new StringContent(JsonConvert.SerializeObject(dtos), Encoding.UTF8, "application/json");
+        var response = await Client.PutAsync(uri, content);
+        return response.IsSuccessStatusCode;
+    }
 }

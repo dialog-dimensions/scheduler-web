@@ -57,6 +57,10 @@
     
     private bool _isSubmitting = false;
     private bool _submissionFailed = false;
+
+    private bool _isPut = false;
+    private DateTime _scheduleDateTime;
+    private int _employeeId;
     
     protected override async Task OnInitializedAsync()
     {
@@ -93,11 +97,19 @@
             return;
         }
         
-        var exceptions = await ExceptionApiService.GetExceptionsAsync(schedule.StartDateTime, userId);
+        var exceptions = await ExceptionApiService.GetExceptionsAsync(schedule.DeskId, schedule.StartDateTime, userId);
+        var shiftExceptions = (exceptions ?? Array.Empty<ShiftException>()).ToList();
         if (exceptions is null)
         {
             _errorMessage = "Unable to load existing exceptions. Submission may override.";
             exceptions = new List<ShiftException>();
+            shiftExceptions = [];
+        }
+        else if (shiftExceptions.Any())
+        {
+            _isPut = true;
+            _scheduleDateTime = schedule.StartDateTime;
+            _employeeId = userId;
         }
         
         ScheduleData = Transformer.TransformToUiModel(schedule, shiftExceptions);
@@ -136,7 +148,16 @@
         try
         {
             _isSubmitting = true;
-            await ExceptionApiService.FileExceptionsAsync(exceptions);
+            
+            if (_isPut)
+            {
+                await ExceptionApiService.PutExceptionsAsync(DeskId, _scheduleDateTime, _employeeId, exceptions);
+            }
+            else
+            {
+                await ExceptionApiService.FileExceptionsAsync(exceptions);
+            }
+            
             _isSubmitting = false;
             NavigationManager.NavigateTo("/success-exit", true);
         }
