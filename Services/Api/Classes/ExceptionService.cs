@@ -16,7 +16,7 @@ public class ExceptionService(HttpClient client, IJSRuntime jsRuntime)
     {
         await ConfigureAsync();
         
-        var uri = $"api/ShiftException/{scheduleKey:s}/{employeeId}";
+        var uri = $"api/ShiftException/{deskId}/{scheduleStart:s}/{employeeId}";
         var response = await Client.GetAsync(uri);
         if (!response.IsSuccessStatusCode) return null;
         var dtos = await response.Content.ReadFromJsonAsync<IEnumerable<ShiftExceptionDto>>();

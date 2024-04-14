@@ -14,7 +14,7 @@ public class ScheduleService(IJSRuntime jsRuntime, HttpClient client) : ApiServi
     {
         await ConfigureAsync();
         
-        const string uri = "api/Schedule/NearestIncomplete";
+        var uri = $"api/Schedule/{deskId}/NearestIncomplete";
         var response = await Client.GetAsync(uri);
         if (!response.IsSuccessStatusCode) throw new HttpRequestException("Unable to retrieve schedule.");
         if (response.StatusCode == HttpStatusCode.NoContent)
@@ -27,11 +27,11 @@ public class ScheduleService(IJSRuntime jsRuntime, HttpClient client) : ApiServi
 
     }
 
-    public async Task<Schedule?> GetCurrentScheduleAsync()
+    public async Task<Schedule?> GetCurrentScheduleAsync(string deskId)
     {
         await ConfigureAsync();
-
-        const string uri = "api/Schedule/Current";
+        
+        var uri = $"api/Schedule/{deskId}/Current";
         var response = await Client.GetAsync(uri);
         if (!response.IsSuccessStatusCode)
         {
@@ -51,7 +51,7 @@ public class ScheduleService(IJSRuntime jsRuntime, HttpClient client) : ApiServi
     {
         await ConfigureAsync();
 
-        const string uri = "api/Schedule/Next";
+        var uri = $"api/Schedule/{deskId}/Next";
         var response = await Client.GetAsync(uri);
         if (!response.IsSuccessStatusCode) throw new HttpRequestException("Unable to retrieve schedule.");
         if (response.StatusCode == HttpStatusCode.NoContent)

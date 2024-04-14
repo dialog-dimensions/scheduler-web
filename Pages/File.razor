@@ -1,4 +1,4 @@
-﻿@page "/file"
+﻿@page "/file/{DeskId}"
 @using SchedulerWeb.Views.FileExceptions
 
 <h1>דרג.י את המשמרות לפי 4 קטגוריות</h1>
@@ -9,4 +9,10 @@
 <h3>בחר.י את סוג ההתייחסות בכפתור מטה בצד ימין</h3>
 <h3>ובחר.י את המשמרות עליהם ההתייחסות חלה</h3>
 
-<ScheduleManager/>
+<ScheduleManager DeskId="@DeskId"/>
+
+@code
+{
+    [Parameter] 
+    public string DeskId { get; set; }
+}

@@ -64,19 +64,19 @@
     
     protected override async Task OnInitializedAsync()
     {
-        await RuntimeTools.RegisterHomePageUriAsync("file");
+        await RuntimeTools.RegisterHomePageUriAsync($"file/{DeskId}");
         
         var parseId = int.TryParse(await JsRuntime.InvokeAsync<string>("localStorage.getItem", "id"), out var userId);
         if (!parseId)
         {
-            NavigationManager.NavigateTo("/login?redirect=file", true);
+            NavigationManager.NavigateTo($"/login?redirect=file/{DeskId}", true);
             return;
         }
 
         var token = await RuntimeTools.TryGetValidTokenAsync();
         if (token is null)
         {
-            NavigationManager.NavigateTo($"/login?userId={userId}&redirect=file");
+            NavigationManager.NavigateTo($"/login?userId={userId}&redirect=file/{DeskId}");
             return;
         }
         
@@ -84,7 +84,7 @@
 
         try
         {
-            schedule = await ScheduleApiService.GetScheduleToFileAsync();
+            schedule = await ScheduleApiService.GetScheduleToFileAsync(DeskId);
         }
         catch(HttpRequestException ex)
         {

@@ -1,5 +1,5 @@
-﻿@page "/view"
-@page "/view/{Which}"
+﻿@page "/view/{DeskId}"
+@page "/view/{DeskId}/{Which}"
 
 @using SchedulerWeb.Views.ViewSchedule
 @using Microsoft.IdentityModel.Tokens
@@ -14,12 +14,12 @@
 @inject IRuntimeTools RuntimeTools
 
 
-<h3>@_title</h3>
+<h3>@Title</h3>
 <div class="mt-3">
-    <a href="@_otherScheduleRedirect">@_otherScheduleText</a>
+    <a href="@OtherScheduleRedirect">@OtherScheduleText</a>
 </div>
 
-<ScheduleGrid ScheduleData="@scheduleData"/>
+<ScheduleGrid ScheduleData="@_scheduleData"/>
 
 @code {
     [Parameter] 
@@ -40,11 +40,11 @@
         
         if (Which.IsNullOrEmpty() || Which == "current")
         {
-            schedule = await ScheduleService.GetCurrentScheduleAsync();
+            schedule = await ScheduleService.GetCurrentScheduleAsync(DeskId);
         }
         else if (Which == "next")
         {
-            schedule = await ScheduleService.GetNextScheduleAsync();
+            schedule = await ScheduleService.GetNextScheduleAsync(DeskId);
         }
 
         if (schedule is null)
@@ -60,14 +60,14 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await RuntimeTools.RegisterHomePageUriAsync("view");
+        await RuntimeTools.RegisterHomePageUriAsync($"view/{DeskId}");
         
         var validToken = await RuntimeTools.TryGetValidTokenAsync();
         var memoryId = await RuntimeTools.TryGetIdAsync();
         
         if (validToken is null)
         {
-            NavigationManager.NavigateTo($"/login?{(memoryId.IsNullOrEmpty() ? "" : $"userId={memoryId}&")}redirect=view/{Which}");
+            NavigationManager.NavigateTo($"/login?{(memoryId.IsNullOrEmpty() ? "" : $"userId={memoryId}&")}redirect=view/{DeskId}/{Which}");
             return;
         }
         

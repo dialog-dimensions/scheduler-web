@@ -8,13 +8,6 @@ namespace SchedulerWeb.Services.EuiTransform.Classes;
 
 public class EuiTransformer(IJSRuntime jsRuntime) : IEuiTransformer
 {
-    private readonly IJSRuntime _jsRuntime;
-
-    public EuiTransformer(IJSRuntime jsRuntime)
-    {
-        _jsRuntime = jsRuntime;
-    }
-    
     // Transforms the list of Shifts and ShiftExceptions into a UI-friendly structure
     public List<List<GridSlot>> TransformToUiModel(IEnumerable<Shift> shifts, IEnumerable<ShiftException> exceptions)
     {
@@ -28,7 +21,7 @@ public class EuiTransformer(IJSRuntime jsRuntime) : IEuiTransformer
         return shiftsByDate
             .Select(dateGroup => (
                 from shift in dateGroup.OrderBy(s => s.StartDateTime) 
-                let exception = exceptions.FirstOrDefault(e => e.ShiftKey == shift.StartDateTime) 
+                let exception = exceptions.FirstOrDefault(e => e.ShiftStart == shift.StartDateTime) 
                 let exceptionType = exception?.ExceptionType ?? ExceptionType.NoException 
                 select new GridSlot
                 {
@@ -56,7 +49,7 @@ public class EuiTransformer(IJSRuntime jsRuntime) : IEuiTransformer
                 where slot.ExceptionType != ExceptionType.NoException 
                 select new ShiftException 
                 { 
-                    ShiftKey = slot.StartDateTime, 
+                    ShiftStart = slot.StartDateTime, 
                     EmployeeId = userId, 
                     ExceptionType = slot.ExceptionType 
                 });
