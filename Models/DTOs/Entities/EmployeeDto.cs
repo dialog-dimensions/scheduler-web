@@ -11,6 +11,7 @@ public class EmployeeDto : IDto<Employee, EmployeeDto>
     public double DifficultBalance { get; set; }
     public bool Active { get; set; }
     public string Role { get; set; }
+    public UnitDto Unit { get; set; }
 
     public static EmployeeDto FromEntity(Employee entity)
     {
@@ -20,6 +21,7 @@ public class EmployeeDto : IDto<Employee, EmployeeDto>
     public Employee ToEntity() => new()
     {
         Id = Id,
-        Name = Name
+        Name = Name,
+        Unit = Unit.ToEntity()
     };
 }

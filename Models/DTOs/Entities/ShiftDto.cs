@@ -5,24 +5,27 @@ namespace SchedulerWeb.Models.DTOs.Entities;
 
 public class ShiftDto : IDto<Shift, ShiftDto>
 {
+    public DeskDto Desk { get; set; }
     public DateTime StartDateTime { get; set; }
     public DateTime EndDateTime { get; set; }
-    public DateTime ScheduleKey { get; set; }
+    public DateTime ScheduleStart { get; set; }
     public EmployeeDto? Employee { get; set; }
     
     public static ShiftDto FromEntity(Shift entity) => new()
     { 
+        Desk = DeskDto.FromEntity(entity.Desk),
         StartDateTime = entity.StartDateTime, 
         EndDateTime = entity.EndDateTime, 
         Employee = entity.Employee is null ? null : EmployeeDto.FromEntity(entity.Employee),
-        ScheduleKey = entity.ScheduleKey
+        ScheduleStart = entity.ScheduleStart
     };
 
     public Shift ToEntity() => new()
     {
+        Desk = Desk.ToEntity(),
         StartDateTime = StartDateTime,
         EndDateTime = EndDateTime,
         Employee = Employee?.ToEntity(),
-        ScheduleKey = ScheduleKey
+        ScheduleStart = ScheduleStart
     };
 }

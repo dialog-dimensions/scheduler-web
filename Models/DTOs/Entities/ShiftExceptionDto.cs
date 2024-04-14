@@ -6,7 +6,8 @@ namespace SchedulerWeb.Models.DTOs.Entities;
 
 public class ShiftExceptionDto : IDto<ShiftException, ShiftExceptionDto>
 {
-    public DateTime ShiftKey { get; set; }
+    public DeskDto Desk { get; set; }
+    public DateTime ShiftStart { get; set; }
     public int EmployeeId { get; set; }
     public ExceptionType ExceptionType { get; set; }
     public string? Reason { get; set; }
@@ -14,7 +15,8 @@ public class ShiftExceptionDto : IDto<ShiftException, ShiftExceptionDto>
 
     public static ShiftExceptionDto FromEntity(ShiftException entity) => new()
     {
-        ShiftKey = entity.ShiftKey,
+        Desk = DeskDto.FromEntity(entity.Desk),
+        ShiftStart = entity.ShiftStart,
         EmployeeId = entity.EmployeeId,
         ExceptionType = entity.ExceptionType,
         Reason = entity.Reason
@@ -22,7 +24,8 @@ public class ShiftExceptionDto : IDto<ShiftException, ShiftExceptionDto>
 
     public ShiftException ToEntity() => new()
     {
-        ShiftKey = ShiftKey,
+        Desk = Desk.ToEntity(),
+        ShiftStart = ShiftStart,
         EmployeeId = EmployeeId,
         ExceptionType = ExceptionType,
         Reason = Reason

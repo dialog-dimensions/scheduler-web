@@ -5,13 +5,7 @@ namespace SchedulerWeb.Models.DTOs.Entities;
 
 public class ScheduleDto : List<ShiftDto>, IDto<Schedule, ScheduleDto>
 {
-    public DateTime? StartDateTime => this.MinBy(s => s.StartDateTime)?.StartDateTime;
-    public DateTime? EndDateTime => this.MaxBy(s => s.EndDateTime)?.EndDateTime;
-
-    public int? ShiftDuration => StartDateTime.HasValue & EndDateTime.HasValue
-        ? (int)double.Round(EndDateTime!.Value.Subtract(StartDateTime!.Value).TotalHours / Count)
-        : null;
-
+    public DeskDto Desk => SomeShift.Desk;
     public DateTime StartDateTime => FirstShift.StartDateTime;
     public DateTime EndDateTime => LastShift.EndDateTime;
     public int ShiftDuration => (int)(Duration.TotalHours / Count);
@@ -35,6 +29,7 @@ public class ScheduleDto : List<ShiftDto>, IDto<Schedule, ScheduleDto>
         
         result.AddRange(this.Select(shiftDto => new Shift
         {
+            Desk = Desk.ToEntity(),
             StartDateTime = shiftDto.StartDateTime,
             EndDateTime = shiftDto.EndDateTime,
             ScheduleStart = StartDateTime,

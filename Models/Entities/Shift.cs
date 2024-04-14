@@ -2,11 +2,23 @@
 
 public class Shift
 {
+    private Desk _desk;
+    public Desk Desk
+    {
+        get => _desk;
+        set
+        {
+            _desk = value;
+            DeskId = value.Id;
+        }
+    }
+    public string DeskId { get; set; }
+
     public DateTime StartDateTime { get; set; }
     public DateTime EndDateTime { get; set; }
-    public DateTime ScheduleKey { get; set; }
-    public Employee? Employee { get; set; }
-}
+    public DateTime ScheduleStart { get; set; }
+
+    private Employee? _employee;
 
     public Employee? Employee
     {
