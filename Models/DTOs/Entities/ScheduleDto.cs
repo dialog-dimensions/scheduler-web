@@ -31,12 +31,7 @@ public class ScheduleDto : List<ShiftDto>, IDto<Schedule, ScheduleDto>
     
     public Schedule ToEntity()
     {
-        var result = new Schedule
-        {
-            StartDateTime = StartDateTime!.Value, 
-            EndDateTime = EndDateTime!.Value, 
-            ShiftDuration = ShiftDuration!.Value
-        };
+        var result = new Schedule();
         
         result.AddRange(this.Select(shiftDto => new Shift
         {
