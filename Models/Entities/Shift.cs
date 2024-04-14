@@ -8,3 +8,14 @@ public class Shift
     public Employee? Employee { get; set; }
 }
 
+    public Employee? Employee
+    {
+        get => _employee;
+        set
+        {
+            _employee = value;
+            EmployeeId = value?.Id ?? 0;
+        }
+    }
+    public int EmployeeId { get; set; }
+}
