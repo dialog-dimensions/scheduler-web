@@ -26,7 +26,8 @@ public class EuiTransformer(IJSRuntime jsRuntime) : IEuiTransformer
                 select new GridSlot
                 {
                     StartDateTime = shift.StartDateTime, 
-                    ExceptionType = exceptionType
+                    ExceptionType = exceptionType,
+                    Desk = shift.Desk
                 })
                 .ToList())
             .ToList();
@@ -49,6 +50,7 @@ public class EuiTransformer(IJSRuntime jsRuntime) : IEuiTransformer
                 where slot.ExceptionType != ExceptionType.NoException 
                 select new ShiftException 
                 { 
+                    Desk = slot.Desk,
                     ShiftStart = slot.StartDateTime, 
                     EmployeeId = userId, 
                     ExceptionType = slot.ExceptionType 
@@ -72,6 +74,7 @@ public class EuiTransformer(IJSRuntime jsRuntime) : IEuiTransformer
                     from shift in dateGroup.OrderBy(s => s.StartDateTime) 
                     select new GridSlot
                     {
+                        Desk = shift.Desk,
                         StartDateTime = shift.StartDateTime,
                         Employee = shift.Employee
                     })
