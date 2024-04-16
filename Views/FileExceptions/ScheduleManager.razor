@@ -154,7 +154,10 @@
             }
             else
             {
-                await ExceptionApiService.FileExceptionsAsync(exceptions);
+                if (!await ExceptionApiService.FileExceptionsAsync(exceptions))
+                {
+                    throw new InvalidOperationException();
+                }
             }
             
             _isSubmitting = false;
